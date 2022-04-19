@@ -92,8 +92,6 @@ class NaturalPolicyGradientAlgorithm(iwpg.IWPGAlgorithm):
         self.update_policy_net(data)
         # Update Value Function
         self.update_value_net(data=data)
-        if self.use_cost_value_function:
-            self.update_cost_net(data=data)
         # Update running statistics, e.g. observation standardization
         # Note: observations from are raw outputs from environment
         self.update_running_statistics(raw_data)

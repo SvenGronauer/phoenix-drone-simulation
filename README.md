@@ -84,13 +84,6 @@ The functional interface follows the API of the OpenAI Gym (Brockman et al.,
 >>> next_observation, reward, done, info = env.step(random_action)
 ```
 
-Besides the reward signal, our environments provide additional information 
-that is contained in the `info` dictionary:
-```
->>> info
-{'cost': 1.0}
-```
-
 A minimal code for visualizing a uniformly random policy in a GUI, can be seen 
 in:
 
@@ -115,9 +108,9 @@ visuals.
 
 # Training Policies
 
-To train an agent with the TRPO algorithm call:
+To train an agent with the PPO algorithm call:
 ```
-$ python -m phoenix_drone_simulation.train --alg trpo --env DroneHoverBulletEnv-v0
+$ python -m phoenix_drone_simulation.train --alg ppo --env DroneHoverBulletEnv-v0
 ```
 
 This works with basically every environment that is compatible with the OpenAI 
