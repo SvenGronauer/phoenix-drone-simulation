@@ -1,0 +1,71 @@
+{
+    "ac_kwargs":	{
+        "pi":	{
+            "activation":	"relu",
+            "hidden_sizes":	[
+                50,
+                50
+            ]
+        },
+        "val":	{
+            "activation":	"tanh",
+            "hidden_sizes":	[
+                64,
+                64
+            ]
+        }
+    },
+    "actor":	"mlp",
+    "adv_estimation_method":	"gae",
+    "aggregate_phy_steps":	2,
+    "alg":	"ppo",
+    "check_freq":	25,
+    "control_mode":	"PWM",
+    "domain_randomization":	0.1,
+    "entropy_coef":	0.01,
+    "env_id":	"DroneCircleBulletEnv-v0",
+    "epochs":	500,
+    "exp_name":	"DroneCircleBulletEnv-v0/ppo",
+    "gamma":	0.99,
+    "lam":	0.95,
+    "lam_c":	0.95,
+    "latency":	0.02,
+    "logger_kwargs":	{
+        "exp_name":	"DroneCircleBulletEnv-v0/ppo",
+        "level":	0,
+        "log_dir":	"/var/tmp/ga87zej/DroneCircleBulletEnv-v0/ppo/2021-12-14__10-52-33/seed_00042",
+        "use_tensor_board":	true,
+        "verbose":	false
+    },
+    "max_ep_len":	1000,
+    "max_grad_norm":	0.5,
+    "motor_thrust_noise":	0.05,
+    "motor_time_constant":	0.12,
+    "num_mini_batches":	16,
+    "observation_history_size":	2,
+    "observation_noise":	1,
+    "optimizer":	"Adam",
+    "pi_lr":	0.0003,
+    "save_freq":	10,
+    "seed":	42,
+    "steps_per_epoch":	64000,
+    "target_kl":	0.01,
+    "train_pi_iterations":	80,
+    "train_v_iterations":	5,
+    "trust_region":	"plain",
+    "use_cost_value_function":	false,
+    "use_entropy":	false,
+    "use_exploration_noise_anneal":	true,
+    "use_kl_early_stopping":	false,
+    "use_linear_lr_decay":	true,
+    "use_max_grad_norm":	false,
+    "use_reward_penalty":	false,
+    "use_reward_scaling":	true,
+    "use_shared_weights":	false,
+    "use_standardized_advantages":	false,
+    "use_standardized_obs":	true,
+    "verbose":	true,
+    "vf_lr":	0.001,
+    "video_freq":	-1,
+    "weight_initialization":	"kaiming_uniform"
+}
