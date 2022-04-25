@@ -39,7 +39,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <origin rpy="0 0 55" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/cf2withoutRotors.dae" scale="0.87 0.87 0.87"/>
+        <mesh filename="meshes/cf2withoutRotors.dae" scale="0.86 0.86 0.86"/>
       </geometry>
       <material name="grey">
         <color rgba=".5 .5 .5 1"/>
@@ -70,7 +70,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <material name="dark_gray"/>
       <geometry>
-         <mesh filename="meshes/propeller_ccw.dae" scale=".022 .022 .022"/>
+         <mesh filename="meshes/ccw_prop.stl" scale="1 1 1"/>
       </geometry>
     </visual>
     <collision>
@@ -96,7 +96,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <material name="dark_gray"/>
       <geometry>
-         <mesh filename="meshes/propeller_cw.dae" scale=".022 .022 .022"/>
+         <mesh filename="meshes/cw_prop.stl" scale="1 1 1"/>
       </geometry>
     </visual>
     <collision>
@@ -122,7 +122,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <material name="dark_gray"/>
       <geometry>
-         <mesh filename="meshes/propeller_ccw.dae" scale=".022 .022 .022"/>
+         <mesh filename="meshes/ccw_prop.stl" scale="1 1 1"/>
       </geometry>
     </visual>
     <collision>
@@ -147,7 +147,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <material name="dark_gray"/>
       <geometry>
-         <mesh filename="meshes/propeller_cw.dae" scale=".022 .022 .022"/>
+          <mesh filename="meshes/cw_prop.stl" scale="1 1 1"/>
       </geometry>
     </visual>
     <collision>
