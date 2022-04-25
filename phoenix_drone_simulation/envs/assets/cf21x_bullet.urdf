@@ -2,6 +2,8 @@
 
 <robot name="cf21">
 
+
+
 <!-- ======================================================================
 This URDF file is adapted to the CrazyFlie hardware and firmware setup.
 In contrast to cf2x.urdf, the motor IDs have a different order.
@@ -9,7 +11,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
   <!-- Note: original parameters: thrust2weight="2.25" -->
   <properties arm="0.0397" kf="3.16e-10" km="7.94e-12" thrust2weight="1.8" max_speed_kmh="30" gnd_eff_coeff="11.36859" prop_radius="2.31348e-2" drag_coeff_xy="9.1785e-7" drag_coeff_z="10.311e-7" dw_coeff_1="2267.18" dw_coeff_2=".16" dw_coeff_3="-.11" />
 
-  <link name="base_link"> 
+  <link name="base_link">
 
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -37,11 +39,11 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <origin rpy="0 0 55" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="./cf2.dae" scale=" 1 1 1"/>
-      </geometry> 
+        <mesh filename="meshes/cf2withoutRotors.dae" scale="0.87 0.87 0.87"/>
+      </geometry>
       <material name="grey">
         <color rgba=".5 .5 .5 1"/>
-      </material> 
+      </material>
     </visual>
 
     <collision>
@@ -49,57 +51,111 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
       <geometry>
         <cylinder radius=".06" length=".025"/>
       </geometry>
-    </collision>  
+    </collision>
 
   </link>
 
-  <link name="m1_link">
-    <inertial>
-      <origin rpy="0 0 0" xyz="0.028 -0.028 0"/>
-      <mass value="0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
-    </inertial>
-  </link>
-  <joint name="prop3_joint" type="fixed">
+  <joint name="prop1_joint" type="continuous">
+    <origin rpy="0 0 0" xyz="0.028 -0.028 0.0108"/>
     <parent link="base_link"/>
     <child link="m1_link"/>
+    <axis xyz="0 0 -1"/>
   </joint>
-
-   <link name="m2_link">
+  <link name="m1_link">
     <inertial>
-      <origin rpy="0 0 0" xyz="-0.028 -0.028 0"/>
-      <mass value="0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      <mass value="1.0e-9"/>
+      <!-- [kg] -->
+      <inertia ixx="1.0e-09" ixy="0.0" ixz="0.0" iyy="1.0e-09" iyz="0.0" izz="1.0e-09"/>
     </inertial>
+    <visual>
+      <material name="dark_gray"/>
+      <geometry>
+         <mesh filename="meshes/propeller_ccw.dae" scale=".022 .022 .022"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.005" radius="0.015"/>
+      </geometry>
+    </collision>
   </link>
-  <joint name="prop2_joint" type="fixed">
+
+
+  <joint name="prop2_joint" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.028 -0.028 0.0108"/>
     <parent link="base_link"/>
     <child link="m2_link"/>
+    <axis xyz="0 0 1"/>
   </joint>
-
-  <link name="m3_link">
+   <link name="m2_link">
     <inertial>
-      <origin rpy="0 0 0" xyz="-0.028 0.028 0"/>
-      <mass value="0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      <mass value="1.0e-9"/>
+      <!-- [kg] -->
+      <inertia ixx="1.0e-09" ixy="0.0" ixz="0.0" iyy="1.0e-09" iyz="0.0" izz="1.0e-09"/>
     </inertial>
+    <visual>
+      <material name="dark_gray"/>
+      <geometry>
+         <mesh filename="meshes/propeller_cw.dae" scale=".022 .022 .022"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.005" radius="0.015"/>
+      </geometry>
+    </collision>
   </link>
-  <joint name="prop1_joint" type="fixed">
+
+
+  <joint name="prop3_joint" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.028 0.028 0.0108"/>
     <parent link="base_link"/>
     <child link="m3_link"/>
+    <axis xyz="0 0 -1"/>
   </joint>
-
-  <link name="m4_link">
+  <link name="m3_link">
     <inertial>
-      <origin rpy="0 0 0" xyz="0.028 0.028 0"/>
-      <mass value="0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      <mass value="1.0e-9"/>
+      <!-- [kg] -->
+      <inertia ixx="1.0e-09" ixy="0.0" ixz="0.0" iyy="1.0e-09" iyz="0.0" izz="1.0e-09"/>
     </inertial>
+    <visual>
+      <material name="dark_gray"/>
+      <geometry>
+         <mesh filename="meshes/propeller_ccw.dae" scale=".022 .022 .022"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.005" radius="0.015"/>
+      </geometry>
+    </collision>
   </link>
-  <joint name="prop0_joint" type="fixed">
+
+  <joint name="prop4_joint" type="continuous">
+    <origin rpy="0 0 0" xyz="0.028 0.028 0.0108"/>
     <parent link="base_link"/>
     <child link="m4_link"/>
+    <axis xyz="0 0 1"/>
   </joint>
+  <link name="m4_link">
+    <inertial>
+      <mass value="1.0e-9"/>
+      <!-- [kg] -->
+      <inertia ixx="1.0e-09" ixy="0.0" ixz="0.0" iyy="1.0e-09" iyz="0.0" izz="1.0e-09"/>
+    </inertial>
+    <visual>
+      <material name="dark_gray"/>
+      <geometry>
+         <mesh filename="meshes/propeller_cw.dae" scale=".022 .022 .022"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.005" radius="0.015"/>
+      </geometry>
+    </collision>
+  </link>
 
   <link name="center_of_mass_link">
     <inertial>
@@ -108,10 +164,13 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
       <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
     </inertial>
   </link>
-  <joint name="center_of_mass_joint" type="fixed">
+  <joint name="center_of_mass_joint" type="continuous">
     <parent link="base_link"/>
     <child link="center_of_mass_link"/>
+    <axis xyz="0 0 1"/>
   </joint>
-
+  <material name="dark_gray">
+    <color rgba="0.3 0.3 0.3 1"/>
+  </material>
 </robot>
 

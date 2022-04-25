@@ -319,6 +319,13 @@ class CrazyFlieAgent(AgentBase):
                 posObj=[0, 0, 0],
                 flags=pb.LINK_FRAME
             )
+        # Do motor speed visualization
+        for i in range(4):
+            self.bc.setJointMotorControl2(bodyUniqueId=self.body_unique_id,
+                                    jointIndex=i,
+                                    controlMode=pb.VELOCITY_CONTROL,
+                                    targetVelocity=self.x[i]*100,
+                                    force=0.010)
 
     def apply_z_torque(self, torque):
         """Apply torque responsible for yaw."""
