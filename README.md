@@ -1,18 +1,25 @@
-# Phoenix-Simulation 
-
-An OpenAI [Gym environment](https://gym.openai.com/envs/#classic_control) based on [PyBullet](https://github.com/bulletphysics/bullet3) for reinforcement learning with quadcopters. 
-
-- The default dynamics are based on [Bitcraze's Crazyflie 2.x nano-quadrotor](https://www.bitcraze.io/documentation/hardware/crazyflie_2_1/crazyflie_2_1-datasheet.pdf)
-
-- Everything after a `$` is entered on a terminal, everything after `>>>` is passed to a Python interpreter
+# Phoenix-Drone-Simulation 
 
 
+An OpenAI [Gym environment](https://gym.openai.com/envs/#classic_control) based 
+on [PyBullet](https://github.com/bulletphysics/bullet3) for learning to control 
+the CrazyFlie quadrotor: 
 
-The following tasks are currently available to fly our drone:
+- Can be used for Reinforcement Learning (check out the examples!) or Model 
+  Predictive Control
+- We used this repository for sim-to-real transfer experiments (see publication [1] below)
+- The implemented dynamics model is based on the [Bitcraze's Crazyflie 2.1 nano-quadrotor](https://www.bitcraze.io/documentation/hardware/crazyflie_2_1/crazyflie_2_1-datasheet.pdf)
 
+
+Circle Task | TakeOff
+--- |  ---
+![Circle](./docs/readme/circle3.gif) |![TakeOff](./docs/readme/takeoff.gif)
+
+
+The following tasks are currently available to fly the little drone:
 - Hover
 - Circle 
-- Take-off *(implemented but not yet working due to reward function !!! )*
+- Take-off *(implemented but not yet working properly: reward function must be tuned!)*
 - ~~Reach~~ (not yet implemented)
 
 
@@ -30,29 +37,26 @@ The following tasks are currently available to fly our drone:
 # Installation and Requirements
 
 Here are the (few) steps to follow to get our repository ready to run. Clone the
-repository and install the phoenix-simulation package via pip. Use the following
-three lines:
-
-The repo is structured as a [Gym Environment](https://github.com/openai/gym/blob/master/docs/creating-environments.md)
-and can be installed with `pip install --editable`
+repository and install the phoenix-drone-simulation package via pip. Note that 
+everything after a `$` is entered on a terminal, while everything after `>>>` 
+is passed to a Python interpreter. Please, use the following three steps for 
+installation:
 ```
 $ git clone https://github.com/SvenGronauer/phoenix-drone-simulation
 $ cd phoenix-drone-simulation/
 $ pip install -e .
 ```
 
+This package follows OpenAI's [Gym Interface](https://github.com/openai/gym/blob/master/docs/creating-environments.md).
+
 > Note: if your default `python` is 2.7, in the following, replace `pip` with `pip3` and `python` with `python3`
 
 
 ## Supported Systems
 
-We tested the repository under *Ubuntu 20.04* and *Mac OS X 11.2* running Python 3.7
-and 3.8. Other system might work as well but have not been tested yet.
+We tested this package under *Ubuntu 20.04* and *Mac OS X 11.2* running Python 
+3.7 and 3.8. Other system might work as well but have not been tested yet.
 Note that PyBullet supports Windows as platform only experimentally!. 
-
-Note: This package has been tested on Mac OS 11 and Ubuntu (18.04 LTS, 
-20.04 LTS), and is probably fine for most recent Mac and Linux operating 
-systems. 
 
 
 ## Dependencies 
