@@ -1,11 +1,5 @@
 import numpy as np
-import gym
-from torch.optim import Adam, SGD
-import time
 import torch
-from phoenix_drone_simulation.algs import core
-from phoenix_drone_simulation.utils import loggers
-import os
 
 
 def conjugate_gradients(Avp, b, nsteps, residual_tol=1e-10, eps=1e-6):

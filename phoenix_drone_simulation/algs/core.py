@@ -146,6 +146,14 @@ class OnPolicyGradientAlgorithm(Algorithm, abc.ABC):
         pass
 
 
+class OffPolicyGradientAlgorithm(Algorithm, abc.ABC):
+
+    @abc.abstractmethod
+    def roll_out(self):
+        """collect data and store to experience buffer."""
+        pass
+
+
 # ====================================
 #       Actor Modules
 # ====================================
