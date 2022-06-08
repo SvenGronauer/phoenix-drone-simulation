@@ -19,8 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     tests_require=['nose'],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    packages=setuptools.find_packages(),
     python_requires=">=3.6",
     include_package_data=True,
     install_requires=[
@@ -30,5 +29,6 @@ setuptools.setup(
         'torch',
         'scipy>= 1.4',
         'mpi4py',
+        'psutil',
     ],
 )
