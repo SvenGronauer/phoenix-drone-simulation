@@ -24,7 +24,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         'numpy',
-        'gym',
+        'gym<=0.20.0',
         'pybullet',
         'torch',
         'scipy>= 1.4',
