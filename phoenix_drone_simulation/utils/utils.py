@@ -472,16 +472,32 @@ def load_actor_critic_and_env_from_disk(
     print(conf)
     env_id = conf.get('env_id')
     env = gym.make(env_id)
+    alg = conf.get('alg', 'ppo')
 
-    ac = core.ActorCritic(
-        actor_type=conf['actor'],
-        observation_space=env.observation_space,
-        action_space=env.action_space,
-        use_standardized_obs=conf['use_standardized_obs'],
-        use_scaled_rewards=conf['use_reward_scaling'],
-        use_shared_weights=False,
-        ac_kwargs=conf['ac_kwargs']
-    )
+    if alg == 'sac':
+        from phoenix_drone_simulation.algs.sac.sac import MLPActorCritic
+        ac = MLPActorCritic(
+            observation_space=env.observation_space,
+            action_space=env.action_space,
+            ac_kwargs=conf['ac_kwargs']
+        )
+    elif alg == "ddpg":
+        from phoenix_drone_simulation.algs.ddpg.ddpg import MLPActorCritic
+        ac = MLPActorCritic(
+            observation_space=env.observation_space,
+            action_space=env.action_space,
+            ac_kwargs=conf['ac_kwargs']
+        )
+    else:
+        ac = core.ActorCritic(
+            actor_type=conf['actor'],
+            observation_space=env.observation_space,
+            action_space=env.action_space,
+            use_standardized_obs=conf['use_standardized_obs'],
+            use_scaled_rewards=conf['use_reward_scaling'],
+            use_shared_weights=False,
+            ac_kwargs=conf['ac_kwargs']
+        )
     model_path = os.path.join(file_name_path, 'torch_save', 'model.pt')
     ac.load_state_dict(torch.load(model_path), strict=False)
     print(f'Successfully loaded model from: {model_path}')
