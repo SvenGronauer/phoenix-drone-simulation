@@ -1,5 +1,5 @@
 """
-    Define default parameters for NPG algorithm.
+    Define default parameters for TRPO algorithm.
 """
 
 
@@ -13,6 +13,7 @@ def defaults():
                     'activation': 'tanh'}
         },
         adv_estimation_method='gae',
+        critic='forward',
         epochs=300,
         gamma=0.99,
         steps_per_epoch=64 * 1000,  # default: 64k

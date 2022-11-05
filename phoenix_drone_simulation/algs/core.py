@@ -15,8 +15,11 @@ import torch.optim as optim
 from torch.distributions.normal import Normal
 from torch.distributions.categorical import Categorical
 from phoenix_drone_simulation.utils.online_mean_std import OnlineMeanStd
+from phoenix_drone_simulation.algs.actor import get_registered_actor_fn
+from phoenix_drone_simulation.algs.critic import get_registered_critic_fn
 
-registered_actors = dict()  # global dict that holds pointers to functions 
+registered_actors = dict()  # global dict that holds pointers to functions
+registered_critics = dict()  # global dict that holds pointers to functions
 
 
 def get_optimizer(opt: str, module: torch.nn.Module, lr: float):
@@ -27,37 +30,37 @@ def get_optimizer(opt: str, module: torch.nn.Module, lr: float):
     return optimizer(module.parameters(), lr=lr)
 
 
-def initialize_layer(
-        init_function: str,
-        layer: torch.nn.Module
-):
-    if init_function == 'kaiming_uniform':  # this the default!
-        nn.init.kaiming_uniform_(layer.weight, a=np.sqrt(5))
-    elif init_function == 'xavier_normal':
-        nn.init.xavier_normal_(layer.weight)
-    # glorot is also known as xavier uniform
-    elif init_function == 'glorot' or init_function == 'xavier_uniform':
-        nn.init.xavier_uniform_(layer.weight)
-    elif init_function == 'orthogonal':  # matches values from baselines repo.
-        nn.init.orthogonal_(layer.weight, gain=np.sqrt(2))
-    else:
-        raise NotImplementedError
+# def initialize_layer(
+#         init_function: str,
+#         layer: torch.nn.Module
+# ):
+#     if init_function == 'kaiming_uniform':  # this the default!
+#         nn.init.kaiming_uniform_(layer.weight, a=np.sqrt(5))
+#     elif init_function == 'xavier_normal':
+#         nn.init.xavier_normal_(layer.weight)
+#     # glorot is also known as xavier uniform
+#     elif init_function == 'glorot' or init_function == 'xavier_uniform':
+#         nn.init.xavier_uniform_(layer.weight)
+#     elif init_function == 'orthogonal':  # matches values from baselines repo.
+#         nn.init.orthogonal_(layer.weight, gain=np.sqrt(2))
+#     else:
+#         raise NotImplementedError
 
 
-def register_actor(actor_name):
-    """ register actor into global dict"""
-    def wrapper(func):
-        registered_actors[actor_name] = func
-        return func
-    return wrapper
-
-
-def get_registered_actor_fn(actor_type: str, distribution_type: str):
-    assert distribution_type == 'categorical' or distribution_type == 'gaussian'
-    actor_fn = actor_type + '_' + distribution_type
-    msg = f'Did not find: {actor_fn} in registered actors.'
-    assert actor_fn in registered_actors, msg
-    return registered_actors[actor_fn]
+# def register_actor(actor_name):
+#     """ register actor into global dict"""
+#     def wrapper(func):
+#         registered_actors[actor_name] = func
+#         return func
+#     return wrapper
+#
+#
+# def get_registered_actor_fn(actor_type: str, distribution_type: str):
+#     assert distribution_type == 'categorical' or distribution_type == 'gaussian'
+#     actor_fn = actor_type + '_' + distribution_type
+#     msg = f'Did not find: {actor_fn} in registered actors.'
+#     assert actor_fn in registered_actors, msg
+#     return registered_actors[actor_fn]
 
 
 def combined_shape(length: int, shape=None):
@@ -66,36 +69,36 @@ def combined_shape(length: int, shape=None):
     return (length, shape) if np.isscalar(shape) else (length, *shape)
 
 
-def convert_str_to_torch_functional(activation):
-    if isinstance(activation, str):  # convert string to torch functional
-        activations = {
-            'identity': nn.Identity,
-            'relu': nn.ReLU,
-            'sigmoid': nn.Sigmoid,
-            'softplus': nn.Softplus,
-            'tanh': nn.Tanh
-        }
-        assert activation in activations
-        activation = activations[activation]
-    assert issubclass(activation, torch.nn.Module)
-    return activation
-
-
-def build_mlp_network(
-        sizes,
-        activation,
-        output_activation='identity',
-        weight_initialization='kaiming_uniform'
-):
-    activation = convert_str_to_torch_functional(activation)
-    output_activation = convert_str_to_torch_functional(output_activation)
-    layers = list()
-    for j in range(len(sizes) - 1):
-        act = activation if j < len(sizes) - 2 else output_activation
-        affine_layer = nn.Linear(sizes[j], sizes[j + 1])
-        initialize_layer(weight_initialization, affine_layer)
-        layers += [affine_layer, act()]
-    return nn.Sequential(*layers)
+# def convert_str_to_torch_functional(activation):
+#     if isinstance(activation, str):  # convert string to torch functional
+#         activations = {
+#             'identity': nn.Identity,
+#             'relu': nn.ReLU,
+#             'sigmoid': nn.Sigmoid,
+#             'softplus': nn.Softplus,
+#             'tanh': nn.Tanh
+#         }
+#         assert activation in activations
+#         activation = activations[activation]
+#     assert issubclass(activation, torch.nn.Module)
+#     return activation
+#
+#
+# def build_mlp_network(
+#         sizes,
+#         activation,
+#         output_activation='identity',
+#         weight_initialization='kaiming_uniform'
+# ):
+#     activation = convert_str_to_torch_functional(activation)
+#     output_activation = convert_str_to_torch_functional(output_activation)
+#     layers = list()
+#     for j in range(len(sizes) - 1):
+#         act = activation if j < len(sizes) - 2 else output_activation
+#         affine_layer = nn.Linear(sizes[j], sizes[j + 1])
+#         initialize_layer(weight_initialization, affine_layer)
+#         layers += [affine_layer, act()]
+#     return nn.Sequential(*layers)
 
 
 def count_vars(module):
@@ -154,171 +157,15 @@ class OffPolicyGradientAlgorithm(Algorithm, abc.ABC):
         pass
 
 
-# ====================================
-#       Actor Modules
-# ====================================
-
-
-class Actor(nn.Module):
-    def __init__(self, obs_dim, act_dim, weight_initialization, shared=None):
-        super(Actor, self).__init__()
-        self.obs_dim = obs_dim
-        self.act_dim = act_dim
-        self.shared = shared
-        self.weight_initialization = weight_initialization
-
-    def dist(self, obs) -> torch.distributions.Distribution:
-        raise NotImplementedError
-
-    def log_prob_from_dist(self, pi, act) -> torch.Tensor:
-        raise NotImplementedError
-
-    def forward(self, obs, act=None) -> tuple:
-        # Produce action distributions for given observations, and
-        # optionally compute the log likelihood of given actions under
-        # those distributions.
-        pi = self.dist(obs)
-        logp_a = None
-        if act is not None:
-            logp_a = self.log_prob_from_dist(pi, act)
-        return pi, logp_a
-
-    def sample(self, obs) -> tuple:
-        raise NotImplementedError
-
-    def predict(self, obs) -> tuple:
-        """ Predict action based on observation without exploration noise.
-            Use this method for evaluation purposes. """
-        return self.sample(obs)
-
-
-@register_actor("mlp_categorical")
-class MLPCategoricalActor(Actor):
-
-    def __init__(self, obs_dim, act_dim, hidden_sizes, activation,
-                 weight_initialization, shared=None):
-        super().__init__(obs_dim, act_dim, weight_initialization, shared=shared)
-        if shared is not None:
-            raise NotImplementedError
-        self.net = build_mlp_network(
-            [obs_dim] + list(hidden_sizes) + [act_dim],
-            activation=activation,
-            weight_initialization=weight_initialization
-        )
-
-    def dist(self, obs) -> torch.distributions.Distribution:
-        logits = self.net(obs)
-        return Categorical(logits=logits)
-
-    def log_prob_from_dist(self, pi, act) -> torch.Tensor:
-        return pi.log_prob(act)
-
-    def sample(self, obs) -> tuple:
-        # frac is necessary for epsilon greedy
-        # eps_threshold = np.max([self.current_eps, self.min_eps])
-
-        dist = self.dist(obs)
-        a = dist.sample()
-        logp_a = self.log_prob_from_dist(dist, a)
-
-        return a, logp_a
-
-
-@register_actor("mlp_gaussian")
-class MLPGaussianActor(Actor):
-    def __init__(
-            self,
-            obs_dim,
-            act_dim,
-            hidden_sizes,
-            activation,
-            weight_initialization,
-            shared=None):
-        super().__init__(obs_dim, act_dim, weight_initialization)
-        log_std = np.log(0.5) * np.ones(self.act_dim, dtype=np.float32)
-        self.log_std = torch.nn.Parameter(torch.as_tensor(log_std),
-                                          requires_grad=False)
-
-        if shared is not None:  # use shared layers
-            action_head = nn.Linear(hidden_sizes[-1], act_dim)
-            self.net = nn.Sequential(shared, action_head, nn.Identity())
-        else:
-            layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
-            self.net = build_mlp_network(
-                layers,
-                activation=activation,
-                weight_initialization=weight_initialization
-            )
-
-    def dist(self, obs):
-        mu = self.net(obs)
-        return Normal(mu, self.std)
-
-    def log_prob_from_dist(self, pi, act) -> torch.Tensor:
-        # Last axis sum needed for Torch Normal distribution
-        return pi.log_prob(act).sum(axis=-1)
-
-    def sample(self, obs):
-        pi = self.dist(obs)
-        a = pi.sample()
-        logp_a = self.log_prob_from_dist(pi, a)
-
-        return a, logp_a
-
-    def set_log_std(self, frac):
-        """ To support annealing exploration noise.
-            frac is annealing from 1. to 0 over course of training"""
-        assert 0 <= frac <= 1
-        new_stddev = 0.499 * frac + 0.01  # annealing from 0.5 to 0.01
-        # new_stddev = 0.3 * frac + 0.2  # linearly anneal stddev from 0.5 to 0.2
-        log_std = np.log(new_stddev) * np.ones(self.act_dim, dtype=np.float32)
-        self.log_std = torch.nn.Parameter(torch.as_tensor(log_std),
-                                          requires_grad=False)
-
-    @property
-    def std(self):
-        """ Standard deviation of distribution."""
-        return torch.exp(self.log_std)
-
-    def predict(self, obs):
-        """ Predict action based on observation without exploration noise.
-            Use this method for evaluation purposes. """
-        action = self.net(obs)
-        log_p = torch.ones_like(action)  # avoid type conflicts at evaluation
-
-        return action, log_p
-
-
-# ====================================
-#       Critic Modules
-# ====================================
-
-
-class MLPCritic(nn.Module):
-
-    def __init__(self, obs_dim, hidden_sizes, activation, shared=None):
-        super().__init__()
-        if shared is None:
-            self.net = build_mlp_network([obs_dim] + list(hidden_sizes) + [1],
-                                           activation=activation)
-        else:  # use shared layers
-            value_head = nn.Linear(hidden_sizes[-1], 1)
-            self.net = nn.Sequential(shared, value_head, nn.Identity())
-
-    def forward(self, obs):
-        return torch.squeeze(self.net(obs),
-                             -1)  # Critical to ensure v has right shape.
-
-
 class ActorCritic(nn.Module):
     def __init__(self,
                  actor_type,
                  observation_space,
                  action_space,
                  ac_kwargs,
+                 critic_type='forward',
                  use_standardized_obs = True,
                  use_scaled_rewards = False,
-                 use_shared_weights = False,
                  weight_initialization='kaiming_uniform'
                  ):
         super().__init__()
@@ -332,33 +179,23 @@ class ActorCritic(nn.Module):
             distribution_type = 'gaussian'
             act_dim = action_space.shape[0]
         elif isinstance(action_space, Discrete):
-            distribution_type = 'categorical'
-            act_dim = action_space.n
+            raise NotImplementedError
         else:
             raise ValueError
 
         obs_dim = observation_space.shape[0]
-        layer_units = [obs_dim] + list(ac_kwargs['pi']['hidden_sizes'])
-        act = ac_kwargs['pi']['activation']
-        if use_shared_weights:
-            shared = build_mlp_network(
-                layer_units,
-                activation=act,
-                weight_initialization=weight_initialization,
-                output_activation=act
-            )
-        else:
-            shared = None
 
         actor_fn = get_registered_actor_fn(actor_type, distribution_type)
         self.pi = actor_fn(obs_dim=obs_dim,
                            act_dim=act_dim,
-                           shared=shared,
                            weight_initialization=weight_initialization,
                            **ac_kwargs['pi'])
-        self.v = MLPCritic(obs_dim,
-                           shared=shared,
-                           **ac_kwargs['val'])
+
+        critic_fn = get_registered_critic_fn(critic_type)
+        print("="*55)
+        print(critic_fn)
+        print(ac_kwargs['val'])
+        self.v = critic_fn(obs_dim, **ac_kwargs['val'])
 
         self.ret_oms = OnlineMeanStd(shape=(1,)) if use_scaled_rewards else None
 
@@ -444,6 +281,8 @@ class Buffer:
         self.target_val_buf = np.zeros(size, dtype=np.float32)
         self.val_buf = np.zeros(size, dtype=np.float32)
         self.logp_buf = np.zeros(size, dtype=np.float32)
+        self.path_slice_buf = []
+
         self.gamma = gamma
         self.lam = lam
         self.adv_estimation_method = adv_estimation_method
@@ -453,7 +292,6 @@ class Buffer:
         self.ptr = 0
         self.path_start_idx = 0
         self.max_size = size
-
 
     def calculate_adv_and_value_targets(self, vals, rews, lam=None):
         """ Compute the estimated advantage"""
@@ -514,6 +352,8 @@ class Buffer:
         rews = np.append(self.rew_buf[path_slice], last_val)
         vals = np.append(self.val_buf[path_slice], last_val)
 
+        self.path_slice_buf.append(path_slice)
+
         # new: add discounted returns to buffer
         discounted_ret = discount_cumsum(rews, self.gamma)[:-1]
         self.discounted_ret_buf[path_slice] = discounted_ret
@@ -551,7 +391,9 @@ class Buffer:
             adv=self.adv_buf, log_p=self.logp_buf,
             # rew=self.rew_buf,
             discounted_ret=self.discounted_ret_buf,
+            path_slice=[[s.start, s.stop] for s in self.path_slice_buf]
         )
+        self.path_slice_buf = []
 
         return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in
                 data.items()}

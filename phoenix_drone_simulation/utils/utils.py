@@ -491,11 +491,11 @@ def load_actor_critic_and_env_from_disk(
     else:
         ac = core.ActorCritic(
             actor_type=conf['actor'],
+            critic_type=conf['critic'],
             observation_space=env.observation_space,
             action_space=env.action_space,
             use_standardized_obs=conf['use_standardized_obs'],
             use_scaled_rewards=conf['use_reward_scaling'],
-            use_shared_weights=False,
             ac_kwargs=conf['ac_kwargs']
         )
     model_path = os.path.join(file_name_path, 'torch_save', 'model.pt')

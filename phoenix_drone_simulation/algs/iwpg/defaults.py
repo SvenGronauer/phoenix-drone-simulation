@@ -14,6 +14,7 @@ def defaults():
                     'activation': 'tanh'}
         },
         adv_estimation_method='gae',
+        critic='forward',
         epochs=300,
         gamma=0.99,
         steps_per_epoch=32 * 1000,
