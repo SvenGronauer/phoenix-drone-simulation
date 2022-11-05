@@ -186,6 +186,9 @@ class DroneHoverBaseEnv(DroneBaseEnv):
         reward = -dist - penalties
         return reward
 
+    def get_reference_trajectory(self):
+        raise NotImplementedError
+
     def task_specific_reset(self):
         # set random offset for position
         # Note: use copy() to avoid chaning original initial values

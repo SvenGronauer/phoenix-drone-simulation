@@ -173,6 +173,9 @@ class DroneTakeOffBaseEnv(DroneBaseEnv):
             reward -= 1.
         return reward
 
+    def get_reference_trajectory(self):
+        raise NotImplementedError
+
     def task_specific_reset(self):
         # set random offset for position
         pos = self.init_xyz.copy()  # pos[:2] is call by reference, so copy

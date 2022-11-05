@@ -334,6 +334,11 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         """Implemented by child classes."""
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def get_reference_trajectory(self):
+        """Implemented by child classes."""
+        raise NotImplementedError
+
     def render(
             self,
             mode='human'

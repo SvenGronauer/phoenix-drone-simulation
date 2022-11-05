@@ -50,7 +50,7 @@ class DroneCircleBaseEnv(DroneBaseEnv):
         ts = 2 * np.pi * np.arange(self.num_ref_points) / self.num_ref_points
 
         self.ref_offset = 0  # set by task_specific_reset()-method
-        self.ref = np.zeros((self.num_ref_points, 3))
+        self.ref = np.zeros((len(ts), 3))
         self.ref[:, 2] = 1.  # z-position
         self.ref[:, 1] = circle_radius * np.sin(ts)  # y-position
         self.ref[:, 0] = circle_radius * (1 - np.cos(ts))  # x-position
@@ -184,6 +184,8 @@ class DroneCircleBaseEnv(DroneBaseEnv):
         # Determine penalties
         # spin_penalty = 1e-4 * np.linalg.norm(self.drone.rpy_dot)**2
         act_diff = action - self.last_action
+
+        # todo sven: change reward function such that it is better comparable between PWM, Attitude Rate and ATTITUDE
         normed_clipped_a = 0.5 * (np.clip(action, -1, 1) + 1)
 
         penalty_action = self.penalty_action * np.linalg.norm(normed_clipped_a)
@@ -200,6 +202,13 @@ class DroneCircleBaseEnv(DroneBaseEnv):
         dist = np.linalg.norm(self.drone.xyz - self.target_pos)
         reward = -dist - penalties
         return reward
+
+    def get_reference_trajectory(self, horizon):
+        r"""Returns N-steps of the reference trajectory for tracking."""
+        reference = np.zeros((13, horizon))
+        t = (self.iteration // self.aggregate_phy_steps + self.ref_offset) % self.num_ref_points
+        reference[:3] = self.ref[t:(t+horizon)].T
+        return reference
 
     def task_specific_reset(self):
 
