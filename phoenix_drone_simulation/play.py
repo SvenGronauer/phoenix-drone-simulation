@@ -110,7 +110,8 @@ if __name__ == '__main__':
     else:
         assert args.ckpt, 'Define a checkpoint for non-random play!'
         ac, env = utils.load_actor_critic_and_env_from_disk(args.ckpt)
-
+        print("*" * 55)
+        print(ac.pi.net)
         play_after_training(
             actor_critic=ac,
             env=env,

@@ -39,7 +39,7 @@ class DroneBaseEnv(gym.Env, abc.ABC):
             motor_time_constant: float = 0.080,  # [s]
             motor_thrust_noise: float = 0.05,  # noise in % added to thrusts
             observation_frequency: int = 100,
-            observation_history_size: int = 2,
+            observation_history_size: int = 1,
             observation_noise=0.0,  # default: no noise added to obs
             sim_freq: int = 200
     ):

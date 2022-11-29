@@ -4,9 +4,24 @@ Author:     Sven Gronauer (sven.gronauer@tum.de), Daniel Stümke (daniel.stuemke
 based on:   Spinning Up's Vanilla Policy Gradient
             https://github.com/openai/spinningup/blob/master/spinup/algos/pytorch/vpg/core.py
 """
+from typing import List
+
 import numpy as np
 import torch
 import torch.nn as nn
+
+mlp_activations = {
+    'identity': nn.Identity,
+    'relu': nn.ReLU,
+    'sigmoid': nn.Sigmoid,
+    'softplus': nn.Softplus,
+    'tanh': nn.Tanh
+}
+
+recurrent_layers = {
+    'gru': nn.GRU,
+    'lstm': nn.LSTM
+}
 
 
 def initialize_layer(
@@ -28,27 +43,16 @@ def initialize_layer(
 
 def convert_str_to_torch_functional(activation):
     if isinstance(activation, str):  # convert string to torch functional
-        activations = {
-            'identity': nn.Identity,
-            'relu': nn.ReLU,
-            'sigmoid': nn.Sigmoid,
-            'softplus': nn.Softplus,
-            'tanh': nn.Tanh
-        }
-        assert activation in activations
-        activation = activations[activation]
+        assert activation in mlp_activations
+        activation = mlp_activations[activation]
     assert issubclass(activation, torch.nn.Module)
     return activation
 
 
 def convert_str_to_torch_layer(layer):
     if isinstance(layer, str):  # convert string to torch layer
-        layers = {
-            'GRU': nn.GRU,
-            'LSTM': nn.LSTM
-        }
-        assert layer in layers
-        layer = layers[layer]
+        assert layer in recurrent_layers
+        layer = recurrent_layers[layer]
     assert issubclass(layer, torch.nn.Module)
     return layer
 
@@ -83,32 +87,63 @@ class StatefulRNN(nn.Module):
         return torch.nan_to_num(state.detach())
 
 
-def build_recurrent_network(
-        sizes,
-        activation='identity',
-        output_activation='identity',
+# @DeprecationWarning
+# def build_recurrent_network(
+#         sizes,
+#         activation='identity',
+#         output_activation='identity',
+#         weight_initialization='kaiming_uniform',
+#         layer='GRU'
+# ):
+#     tf_model = None
+#     layer = convert_str_to_torch_layer(layer)
+#     activation = convert_str_to_torch_functional(activation)
+#     output_activation = convert_str_to_torch_functional(output_activation)
+#     layers = list()
+#     layers_rnn = []
+#     for j in range(len(sizes) - 1):
+#         act = activation if j < len(sizes) - 2 else output_activation
+#         lay_stateless = layer(sizes[j], sizes[j + 1],
+#                               batch_first=True) if j < len(sizes) - 2 else None
+#         if lay_stateless is None:
+#             lay_affine = nn.Linear(sizes[j], sizes[j + 1])
+#             initialize_layer(weight_initialization, lay_affine)
+#             lay_statefull = lay_affine
+#         else:
+#             lay_statefull = StatefulRNN(lay_stateless)
+#             layers_rnn.append(lay_statefull)
+#         layers += [lay_statefull, act()]
+#     built_net = nn.Sequential(*layers)
+#     print(built_net)
+#     return built_net, layers_rnn, tf_model
+
+
+def build_network(
+        sizes: List[int],  # in_dim, h_dim, h_dim, out_dim, e.g. [10, 50, 50, 4]
+        layers: List[str],  # e.g. ["tanh, tanh", "tanh"]
         weight_initialization='kaiming_uniform',
-        layer='GRU'
-):
-    tf_model = None
-    layer = convert_str_to_torch_layer(layer)
-    activation = convert_str_to_torch_functional(activation)
-    output_activation = convert_str_to_torch_functional(output_activation)
-    layers = list()
-    layers_rnn = []
+) -> nn.Module:
+    if (len(sizes)-2) == len(layers):  # identitiy as last output activation
+        layers.append("identity")
+    assert (len(sizes)-1) == len(layers)
+    layer_list = list()
     for j in range(len(sizes) - 1):
-        act = activation if j < len(sizes) - 2 else output_activation
-        lay_stateless = layer(sizes[j], sizes[j + 1],
-                              batch_first=True) if j < len(sizes) - 2 else None
-        if lay_stateless is None:
-            lay_affine = nn.Linear(sizes[j], sizes[j + 1])
-            initialize_layer(weight_initialization, lay_affine)
-            lay_statefull = lay_affine
+
+        if layers[j].lower() in mlp_activations:  # this is an affine layer
+            affine_layer = nn.Linear(sizes[j], sizes[j + 1])
+            initialize_layer(weight_initialization, affine_layer)
+            act = convert_str_to_torch_functional(mlp_activations[layers[j].lower()])
+            layer_list += [affine_layer, act()]
+        elif layers[j].lower() in recurrent_layers:
+            rnn_fn = recurrent_layers[layers[j].lower()]
+            recurrent_layer = rnn_fn(sizes[j], sizes[j + 1], batch_first=True)
+            layer_list += [recurrent_layer, nn.Identity()]
         else:
-            lay_statefull = StatefulRNN(lay_stateless)
-            layers_rnn.append(lay_statefull)
-        layers += [lay_statefull, act()]
-    return nn.Sequential(*layers), layers_rnn, tf_model
+            raise ValueError(f"Did not find: {layers[j]} as layer!")
+
+    built_net = nn.Sequential(*layer_list)
+    print(built_net)
+    return built_net
 
 
 class CascadedNN(nn.Module):

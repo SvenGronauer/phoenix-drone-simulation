@@ -4,13 +4,15 @@ Author:     Sven Gronauer (sven.gronauer@tum.de), Daniel Stümke (daniel.stuemke
 based on:   Spinning Up's Vanilla Policy Gradient
             https://github.com/openai/spinningup/blob/master/spinup/algos/pytorch/vpg/core.py
 """
+from typing import List
+
 import numpy as np
 import torch
 import torch.nn as nn
 
 from torch.distributions.normal import Normal
 from phoenix_drone_simulation.algs.net import build_cascaded_network, \
-    build_forward_network, build_recurrent_network
+    build_forward_network, build_network, StatefulRNN
 
 registered_actors = dict()  # global dict that holds pointers to functions
 
@@ -50,9 +52,18 @@ class Actor(nn.Module):
         self.layers_rnn = []
         self.net = None
 
+    @property
+    def recurrent_layers(self) -> List[StatefulRNN]:
+        rnn_layers = []
+        for layer in self.net:
+            if isinstance(layer, StatefulRNN):
+                rnn_layers.append(layer)
+        return rnn_layers
+
     def reset_states(self):
-        for lay_rnn in self.layers_rnn:
+        for lay_rnn in self.recurrent_layers:
             lay_rnn.reset_states()
+
 
     @property
     def std(self):
@@ -110,6 +121,7 @@ class Actor(nn.Module):
         raise NotImplementedError
 
 
+# todo sven: remove recurrent from actor type
 @register_actor("recurrent_gaussian")
 class RecurrentGaussianActor(Actor):
     def __init__(
@@ -117,18 +129,23 @@ class RecurrentGaussianActor(Actor):
             obs_dim,
             act_dim,
             hidden_sizes,
-            activation,
+            layers,
             weight_initialization,
-            layer='GRU',
-            final_std=0.01):
+            final_std=0.01
+    ):
         super().__init__(obs_dim, act_dim, weight_initialization,
                          final_std=final_std)
 
-        layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
-        self.net, self.layers_rnn, self.net_tf = build_recurrent_network(
+        sizes = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
+        # self.net, self.layers_rnn, self.net_tf = build_recurrent_network(
+        #     layers,
+        #     weight_initialization=weight_initialization,
+        #     layer=layer
+        # )
+        self.net = build_network(
+            sizes,
             layers,
             weight_initialization=weight_initialization,
-            layer=layer
         )
 
     @property
@@ -136,54 +153,54 @@ class RecurrentGaussianActor(Actor):
         return True
 
 
-@register_actor("cascaded_gaussian")
-class CascadedGaussianActor(Actor):
-    def __init__(
-            self,
-            obs_dim,
-            act_dim,
-            hidden_sizes,
-            activation,
-            weight_initialization,
-            layer='GRU',
-            final_std=0.01):
-        super().__init__(obs_dim, act_dim, weight_initialization,
-                         final_std=final_std)
-
-        layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
-        self.net, self.layers_rnn, self.net_tf = build_cascaded_network(
-            layers,
-            activation=activation,
-            weight_initialization=weight_initialization,
-            layer=layer
-        )
-
-    @property
-    def is_recurrent(self):
-        return True
-
-
-@register_actor("forward_gaussian")
-class ForwardGaussianActor(Actor):
-    def __init__(
-            self,
-            obs_dim,
-            act_dim,
-            hidden_sizes,
-            activation,
-            weight_initialization,
-            layer=None,
-            final_std=0.01):
-        super().__init__(obs_dim, act_dim, weight_initialization,
-                         final_std=final_std)
-
-        layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
-        self.net, self.net_tf = build_forward_network(
-            layers,
-            activation=activation,
-            weight_initialization=weight_initialization
-        )
-
-    @property
-    def is_recurrent(self):
-        return False
+# @register_actor("cascaded_gaussian")
+# class CascadedGaussianActor(Actor):
+#     def __init__(
+#             self,
+#             obs_dim,
+#             act_dim,
+#             hidden_sizes,
+#             activation,
+#             weight_initialization,
+#             layer='GRU',
+#             final_std=0.01):
+#         super().__init__(obs_dim, act_dim, weight_initialization,
+#                          final_std=final_std)
+#
+#         layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
+#         self.net, self.layers_rnn, self.net_tf = build_cascaded_network(
+#             layers,
+#             activation=activation,
+#             weight_initialization=weight_initialization,
+#             layer=layer
+#         )
+#
+#     @property
+#     def is_recurrent(self):
+#         return True
+#
+#
+# @register_actor("forward_gaussian")
+# class ForwardGaussianActor(Actor):
+#     def __init__(
+#             self,
+#             obs_dim,
+#             act_dim,
+#             hidden_sizes,
+#             activation,
+#             weight_initialization,
+#             layer=None,
+#             final_std=0.01):
+#         super().__init__(obs_dim, act_dim, weight_initialization,
+#                          final_std=final_std)
+#
+#         layers = [self.obs_dim] + list(hidden_sizes) + [self.act_dim]
+#         self.net, self.net_tf = build_forward_network(
+#             layers,
+#             activation=activation,
+#             weight_initialization=weight_initialization
+#         )
+#
+#     @property
+#     def is_recurrent(self):
+#         return False

@@ -3,20 +3,24 @@
 """
 
 
-
 def defaults():
     return dict(
         actor='recurrent',
         ac_kwargs={
             'pi': {
-                'activation': 'identity',
-                'hidden_sizes': [18, 18],
-                'layer': 'GRU'
+                'hidden_sizes': [20, 20],
+                'layers': ['gru', 'tanh', ],
+                # 'activation': 'identity',
+                # 'hidden_sizes': [18, 18],
+                # # 'hiddens': [20, "gru", 20, "tanh", 20, "tanh"],
+                # 'layer': 'GRU'
             },
             'val': {
-                'activation': 'identity',
                 'hidden_sizes': [128, 128],
-                'layer': 'GRU'
+                'layers': ['gru', 'tanh', 'identity'],
+                # 'activation': 'identity',
+                # 'hidden_sizes': [128, 128],
+                # 'layer': 'GRU'
             }
         },
         adv_estimation_method='gae',
