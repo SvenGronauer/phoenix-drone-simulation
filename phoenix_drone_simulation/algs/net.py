@@ -143,7 +143,7 @@ def build_network(
             raise ValueError(f"Did not find: {layers[j]} as layer!")
 
     built_net = nn.Sequential(*layer_list)
-    print(built_net)
+    # print(built_net)
     return built_net
 
 

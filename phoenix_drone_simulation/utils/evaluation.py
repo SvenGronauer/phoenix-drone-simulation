@@ -53,6 +53,7 @@ class EnvironmentEvaluator(object):
         r""" Evaluate actor critic module for given number of evaluations."""
         self.ac = ac
         self.ac.eval()  # disable exploration noise
+        self.ac.reset_states()
 
         if isinstance(env, gym.Env):
             self.env = env
@@ -97,7 +98,7 @@ class EnvironmentEvaluator(object):
 
         while not done:
             obs = torch.as_tensor(x, dtype=torch.float32)
-            action, value, *_ = self.ac(obs)
+            action, value, *_ = self.ac.step(obs)
             x, r, done, info = self.env.step(action)
             ret += r
             costs += info.get('cost', 0.)

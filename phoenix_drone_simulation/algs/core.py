@@ -204,6 +204,10 @@ class ActorCritic(nn.Module):
                 ) -> tuple:
         return self.step(obs)
 
+    def reset_states(self) -> None:
+        self.v.reset_states()
+        self.pi.reset_states()
+
     def step(self,
              obs: torch.Tensor
              ) -> tuple:

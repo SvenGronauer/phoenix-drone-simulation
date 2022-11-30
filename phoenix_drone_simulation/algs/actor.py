@@ -112,6 +112,7 @@ class Actor(nn.Module):
         """ Predict action based on observation without exploration noise.
             Use this method for evaluation purposes. """
         action = self.net(obs)
+        action = torch.nan_to_num(action)
         log_p = torch.ones_like(action)  # avoid type conflicts at evaluation
 
         return action, log_p
