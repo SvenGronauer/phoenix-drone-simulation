@@ -136,7 +136,8 @@ def build_network(
             layer_list += [affine_layer, act()]
         elif layers[j].lower() in recurrent_layers:
             rnn_fn = recurrent_layers[layers[j].lower()]
-            recurrent_layer = rnn_fn(sizes[j], sizes[j + 1], batch_first=True)
+            lay_stateless = rnn_fn(sizes[j], sizes[j + 1], batch_first=True)
+            recurrent_layer = StatefulRNN(lay_stateless)
             layer_list += [recurrent_layer, nn.Identity()]
         else:
             raise ValueError(f"Did not find: {layers[j]} as layer!")
