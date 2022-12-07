@@ -4,38 +4,20 @@ import psutil
 
 import phoenix_drone_simulation  # noqa
 from phoenix_drone_simulation.benchmark import Benchmark
-"""
 
-        ac_kwargs={
-            'pi': {
-                'hidden_sizes': [20, 20],
-                'layers': ['lstm', 'tanh', ],
-                # 'activation': 'identity',
-                # 'hidden_sizes': [18, 18],
-                # # 'hiddens': [20, "lstm", 20, "tanh", 20, "tanh"],
-                # 'layer': 'lstm'
-            },
-            'val': {
-                'hidden_sizes': [64, 64],
-                'layers': ['lstm', 'tanh', 'identity'],
-                # 'activation': 'identity',
-                # 'hidden_sizes': [64, 64],
-                # 'layer': 'lstm'
-            }
-"""
 
 hyper_param_search = [
-    {'pi': {'hidden_sizes': [10, 10], 'layers': ['lstm', 'tanh', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [20, 20], 'layers': ['lstm', 'tanh', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [30, 30], 'layers': ['lstm', 'tanh', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [40, 40], 'layers': ['lstm', 'tanh', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [50, 50], 'layers': ['lstm', 'tanh', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [10, 10], 'layers': ['gru', 'tanh', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [20, 20], 'layers': ['gru', 'tanh', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [30, 30], 'layers': ['gru', 'tanh', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [40, 40], 'layers': ['gru', 'tanh', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [50, 50], 'layers': ['gru', 'tanh', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
     
-    {'pi': {'hidden_sizes': [10, 10], 'layers': ['tanh', 'lstm', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [20, 20], 'layers': ['tanh', 'lstm', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [30, 30], 'layers': ['tanh', 'lstm', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [40, 40], 'layers': ['tanh', 'lstm', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
-    {'pi': {'hidden_sizes': [50, 50], 'layers': ['tanh', 'lstm', ]}, 'val': {'hidden_sizes': [64, 64], 'layers': ['lstm', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [10, 10], 'layers': ['tanh', 'gru', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [20, 20], 'layers': ['tanh', 'gru', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [30, 30], 'layers': ['tanh', 'gru', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [40, 40], 'layers': ['tanh', 'gru', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
+    {'pi': {'hidden_sizes': [50, 50], 'layers': ['tanh', 'gru', ]}, 'val': {'hidden_sizes': [128, 128], 'layers': ['gru', 'tanh', ]}},
 
     
 ]
