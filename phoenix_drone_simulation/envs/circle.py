@@ -164,7 +164,7 @@ class DroneCircleBaseEnv(DroneBaseEnv):
                 omega = self.sensor_noise.add_noise_to_omega(
                     omega=self.drone.rpy_dot, dt=1 / self.SIM_FREQ)
 
-            # apply low-pass filtering to gyro (happens with 100Hz):
+            # apply low-pass filtering to gyro
             omega = self.gyro_lpf.apply(omega)
             obs = np.concatenate(
                 [xyz, quat, vel, omega, error_to_ref])
