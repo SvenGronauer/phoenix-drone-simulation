@@ -1,8 +1,6 @@
 r"""Play and render a trained policy.
 
 Author:     Sven Gronauer (sven.gronauer@tum.de)
-Added:      16.11.2021
-Updated:    16.04.2022 Purged old function snipptes
 """
 import gymnasium as gym
 import time
@@ -10,17 +8,10 @@ import argparse
 import os
 import torch
 import numpy as np
-import warnings
 
 # local imports
 from phoenix_drone_simulation.utils import utils
-from phoenix_drone_simulation.utils.mpi_tools import is_root_process
 
-try:
-    import pybullet_envs  # noqa
-except ImportError:
-    if is_root_process():
-        warnings.warn('pybullet_envs package not found.')
 
 def play_after_training(actor_critic, env, noise=False):
     if not noise:

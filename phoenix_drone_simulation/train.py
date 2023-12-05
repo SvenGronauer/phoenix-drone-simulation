@@ -20,12 +20,6 @@ from phoenix_drone_simulation.utils import utils
 from phoenix_drone_simulation.algs.model import Model
 from phoenix_drone_simulation.utils.mpi_tools import mpi_fork, mpi_print, is_root_process
 
-try:
-    import pybullet_envs  # noqa
-except ImportError:
-    if is_root_process():
-        warnings.warn('pybullet_envs package not found.')
-
 
 def get_training_command_line_args(
         alg: Optional[str] = None,

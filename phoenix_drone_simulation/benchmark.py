@@ -32,17 +32,9 @@ import psutil
 
 
 try:
-    import pybullet_envs  # noqa
-except ImportError:
-    warnings.warn('pybullet_envs package not found.')
-try:
     import bullet_safety_gym  # noqa
 except ImportError:
     warnings.warn('bullet-safety-gym package not found.')
-try:
-    import my_bullet_robots  # noqa
-except ImportError:
-    warnings.warn('my-bullet-robots package not found.')
 
 
 def run_training(**kwargs) -> None:
