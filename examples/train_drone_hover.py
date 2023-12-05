@@ -7,7 +7,7 @@ Author:     Sven Gronauer (sven.gronauer@tum.de)
 Created:    12.05.2021
 Updated:    16.11.2021 use algorithms from phoenix_drone_simulation.algs
 """
-import gym
+import gymnasium as gym
 import getpass
 import time
 import torch
@@ -54,7 +54,7 @@ def main():
         while not done:
             obs = torch.as_tensor(obs, dtype=torch.float32)
             action, value, *_ = model.actor_critic(obs)
-            obs, reward, done, info = env.step(action)
+            obs, reward, terminated, truncated, info = env.step(action)
 
             time.sleep(1/60)
             if done:

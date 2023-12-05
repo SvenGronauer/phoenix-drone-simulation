@@ -18,7 +18,7 @@ import argparse
 import datetime
 import os
 import sys
-import gym
+import gymnasium as gym
 from collections import defaultdict
 import re
 from importlib import import_module
@@ -26,6 +26,7 @@ from importlib import import_module
 # local imports
 import phoenix_drone_simulation.utils.loggers as loggers
 from phoenix_drone_simulation.algs import core
+import phoenix_drone_simulation.utils.mpi_tools as mpi_tools
 
 
 def convert_str_to_torch_functional(activation):
@@ -243,18 +244,15 @@ def get_env_type(env_id: str):
     env_id: str
     """
     all_registered_envs = defaultdict(set)
-    for env in gym.envs.registry.all():
-        try:
-            env_type = env.entry_point.split(':')[0].split('.')[-1]
-            all_registered_envs[env_type].add(env.id)
-        except AttributeError:
-            print('Could not fetch ', env.id)
+    reg = gym.envs.registry
 
-    # Re-parse the gym registry, since we could have new data
-    # since last time.
-    for env in gym.envs.registry.all():
-        env_type = env.entry_point.split(':')[0].split('.')[-1]
-        all_registered_envs[env_type].add(env.id)
+    env_spec: gym.envs.registration.EnvSpec
+    for env_spec in gym.envs.registry.values():
+        try:
+            env_type = env_spec.entry_point.split(':')[0].split('.')[-1]
+            all_registered_envs[env_type].add(env_spec.id)
+        except AttributeError:
+            mpi_tools.mpi_print('Could not fetch ', env_spec.id)
 
     if env_id in all_registered_envs.keys():
         env_type = env_id
@@ -270,9 +268,7 @@ def get_env_type(env_id: str):
         assert env_type is not None, 'env_id {} is not recognized in env types'.format(
             env_id,
             all_registered_envs.keys())
-
     return env_type, env_id
-
 
 def get_defaults_kwargs(alg, env_id):
     """ inspired by OpenAI's baselines."""

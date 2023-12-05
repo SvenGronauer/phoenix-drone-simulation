@@ -6,7 +6,7 @@ based on:   Spinning Up's Vanilla Policy Gradient
 """
 import numpy as np
 import scipy.signal
-from gym.spaces import Box, Discrete
+from gymnasium.spaces import Box, Discrete
 import abc
 
 import torch

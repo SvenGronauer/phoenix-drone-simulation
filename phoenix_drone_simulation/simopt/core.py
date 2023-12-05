@@ -5,7 +5,7 @@ Created:    26-07-2021
 """
 import abc
 import time
-import gym
+import gymnasium as gym
 import os
 import numpy as np
 import pandas as pd

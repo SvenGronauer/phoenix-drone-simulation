@@ -8,7 +8,7 @@ Updated:    22-11-2021 Fixed observations such that sim is equal to real
 import abc
 import pybullet as pb
 import os
-import gym
+import gymnasium as gym
 import numpy as np
 from typing import Optional
 

@@ -4,7 +4,7 @@ Author:     Sven Gronauer (sven.gronauer@tum.de)
 Added:      16.11.2021
 Updated:    16.04.2022 Purged old function snipptes
 """
-import gym
+import gymnasium as gym
 import time
 import argparse
 import os
@@ -38,7 +38,7 @@ def play_after_training(actor_critic, env, noise=False):
             env.render()
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, *_ = actor_critic(obs)
-            x, r, done, info = env.step(action)
+            x, r, terminated, truncated, info = env.step(action)
             costs += info.get('cost', 0.)
             ret += r
             episode_length += 1
@@ -69,7 +69,7 @@ def random_play(env_id, use_graphics):
                 env.render()
                 # time.sleep(0.00025)
             action = env.action_space.sample()
-            _, r, done, info = env.step(action)
+            _, r, terminated, truncated, info = env.step(action)
             ret += r
             ep_length += 1
             costs += info.get('cost', 0.)

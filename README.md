@@ -74,7 +74,7 @@ After the successful installation of the repository, the Bullet-Safety-Gym
 environments can be simply instantiated via `gym.make`. See: 
 
 ```
->>> import gym
+>>> import gymnasium as gym
 >>> import phoenix_drone_simulation
 >>> env = gym.make('DroneHoverBulletEnv-v0')
 ```
@@ -83,16 +83,16 @@ The functional interface follows the API of the OpenAI Gym (Brockman et al.,
 2016) that consists of the three following important functions:
 
 ```
->>> observation = env.reset()
+>>> observation, info = env.reset()
 >>> random_action = env.action_space.sample()  # usually the action is determined by a policy
->>> next_observation, reward, done, info = env.step(random_action)
+>>> next_observation, reward, terminated, truncated, info = env.step(random_action)
 ```
 
 A minimal code for visualizing a uniformly random policy in a GUI, can be seen 
 in:
 
 ```
-import gym
+import gymnasium as gym
 import time
 import phoenix_drone_simulation
 
@@ -104,7 +104,8 @@ while True:
     x = env.reset()
     while not done:
         random_action = env.action_space.sample()
-        x, reward, done, info = env.step(random_action)
+        x, reward, terminated, truncated, info = env.step(random_action)
+        done = terminated or truncated
         time.sleep(0.05)
 ```
 Note that only calling the render function before the reset function triggers 
@@ -120,7 +121,7 @@ $ python -m phoenix_drone_simulation.train --alg ppo --env DroneHoverBulletEnv-v
 This works with basically every environment that is compatible with the OpenAI 
 Gym interface:
 ```
-$ python -m phoenix_drone_simulation.train --alg ppo --env CartPole-v0
+$ python -m phoenix_drone_simulation.train --alg ppo --env Pendulum-v1
 ```
 
 After an RL model has been trained and its checkpoint has been saved on your 
@@ -167,12 +168,13 @@ his trained Actor Critic module and convert the model to a json file format.
 # Version History and Changes
 
 
-| Version | Changes | Date |
-|-------: | :----------------: |  :----------------: |
-| v1.0     | *Public Release*: Simulation parameters as proposed in Publication [1]  | 19.04.2022 | 
-| v0.2     | Add: accurate motor dynamic model and first real-world transfer insights | 21.09.2021 | 
-| v0.1     | Re-factor: of repository  (only Hover task yet implemented)  | 18.05.2021 | 
-| v0.0     | Fork: from [Gym-PyBullet-Drones Repo](https://github.com/utiasDSL/gym-pybullet-drones)  | 01.12.2020 | 
+| Version |                                        Changes                                         |    Date    |
+|--------:|:--------------------------------------------------------------------------------------:|:----------:|
+|    v1.1 |                       Migrated from `gym==0.20.0` to `gymnasium`                        | 05.12.2023 | 
+|    v1.0 |         *Public Release*: Simulation parameters as proposed in Publication [1]         | 19.04.2022 | 
+|    v0.2 |        Add: accurate motor dynamic model and first real-world transfer insights        | 21.09.2021 | 
+|    v0.1 |              Re-factor: of repository  (only Hover task yet implemented)               | 18.05.2021 | 
+|    v0.0 | Fork: from [Gym-PyBullet-Drones Repo](https://github.com/utiasDSL/gym-pybullet-drones) | 01.12.2020 | 
 
 
 # Publications

@@ -7,7 +7,7 @@ import argparse
 import numpy as np
 import psutil
 import sys
-import gym
+import gymnasium as gym
 import getpass
 import time
 import torch

@@ -3,7 +3,7 @@ r"""Export functionalities for custum CrazyFlie Firmware.
 """
 import os
 import json
-import gym
+import gymnasium as gym
 import numpy as np
 import torch
 import torch.nn as nn
@@ -84,7 +84,8 @@ def dump_json(
 
 def convert_actor_critic_to_json(actor_critic: torch.nn.Module,
                                  file_path: str,
-                                 file_name: str = 'model.json'
+                                 file_name: str = 'model.json',
+                                 save_file_path=None
                                  ):
     """Save PyTorch Module as json to disk."""
     input_dim = actor_critic.obs_oms.mean.numpy().shape[0]

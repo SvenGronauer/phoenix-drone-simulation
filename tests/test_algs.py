@@ -1,8 +1,7 @@
 import os
 import sys
 import unittest
-import gym
-import pybullet_envs  # noqa
+import gymnasium as gym
 import time
 import numpy as np
 import psutil
@@ -12,8 +11,8 @@ import phoenix_drone_simulation.utils.mpi_tools as mpi
 import phoenix_drone_simulation.utils.utils as U
 from phoenix_drone_simulation.utils.loggers import setup_logger_kwargs
 
+IMPLEMENTED_ALGS = ['iwpg', 'npg', 'trpo', 'ppo']
 
-IMPLEMENTED_ALGS = ['iwpg', 'npg', 'trpo', 'ppo' ]
 
 class TestAlgorithms(unittest.TestCase):
 
@@ -49,9 +48,12 @@ class TestAlgorithms(unittest.TestCase):
     #         ac, env = self.check_alg(alg, 'DroneCircleBulletEnv-v0', cores=1)
     #         self.assertTrue(isinstance(env, gym.Env))
 
-
     def test_MPI_version_of_algorithms(self):
-        """ Run all the specified algorithms with MPI."""
+        """ Run all the specified algorithms with MPI.
+
+        Important note: this test may raise errors when testing within IDEs (such as PyCharm).
+            => use command line instead, e.g., $ python test_algs.py
+        """
         # Exclude hyper-threading and round cores to anything in: [2, 4, 8, 16, ...]
         physical_cores = 2 ** int(np.log2(psutil.cpu_count(logical=False)))
         assert physical_cores > 1, \
@@ -71,6 +73,7 @@ class TestAlgorithms(unittest.TestCase):
         else:
             # sleep one sec to finish all console prints...
             time.sleep(1)
+
 
 if __name__ == '__main__':
     unittest.main()

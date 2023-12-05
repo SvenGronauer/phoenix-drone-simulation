@@ -8,7 +8,7 @@ https://github.com/openai/spinningup/tree/master/spinup/algos/pytorch/sac
 """
 from copy import deepcopy
 import itertools
-import gym
+import gymnasium as gym
 import time
 
 import numpy as np
@@ -406,7 +406,7 @@ class SoftActorCriticAlgorithm(core.OffPolicyGradientAlgorithm):
             else:
                 a = self.get_action(o, deterministic=False)
 
-            next_o, r, done, info = self.env.step(a)
+            next_o, r, terminated, truncated, info = self.env.step(a)
             ep_ret += r
             ep_len += 1
 

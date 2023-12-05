@@ -5,8 +5,8 @@ https://github.com/hill-a/stable-baselines/blob/master/stable_baselines/common/e
 """
 
 import unittest
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
 import phoenix_drone_simulation  # noqa
 import warnings
@@ -81,11 +81,14 @@ def _check_obs(obs: Union[tuple, dict, np.ndarray, int],
     """
     if not isinstance(observation_space, spaces.Tuple):
         assert not isinstance(obs, tuple), ("The observation returned by the `{}()` "
-                                            "method should be a single value, not a tuple".format(method_name))
+                                            "method should be a single value, not a tuple".format(
+            method_name))
 
     # The check for a GoalEnv is done by the base class
     if isinstance(observation_space, spaces.Discrete):
-        assert isinstance(obs, int), "The observation returned by `{}()` method must be an int".format(method_name)
+        assert isinstance(obs,
+                          int), "The observation returned by `{}()` method must be an int".format(
+            method_name)
     elif _enforce_array_obs(observation_space):
         assert isinstance(obs, np.ndarray), ("The observation returned by `{}()` "
                                              "method must be a numpy array".format(method_name))
@@ -93,12 +96,14 @@ def _check_obs(obs: Union[tuple, dict, np.ndarray, int],
         f'Dimensions mismatch for the `{method_name}()` method: ' \
         f'obs.shape={obs.shape} vs obs_space.shape={observation_space.shape}'
 
-def _check_returned_values(env: gym.Env, observation_space: spaces.Space, action_space: spaces.Space) -> None:
+
+def _check_returned_values(env: gym.Env, observation_space: spaces.Space,
+                           action_space: spaces.Space) -> None:
     """
     Check the returned values by the env when calling `.reset()` or `.step()` methods.
     """
     # because env inherits from gym.Env, we assume that `reset()` and `step()` methods exists
-    obs = env.reset()
+    obs, _ = env.reset()
 
     _check_obs(obs, observation_space, 'reset')
 
@@ -106,21 +111,18 @@ def _check_returned_values(env: gym.Env, observation_space: spaces.Space, action
     action = action_space.sample()
     data = env.step(action)
 
-    assert len(data) == 4, "The `step()` method must return four values: obs, reward, done, info"
+    assert len(data) == 5, "The `step()` method must return five values"
 
     # Unpack
-    obs, reward, done, info = data
+    obs, reward, terminated, truncated, info = data
 
     _check_obs(obs, observation_space, 'step')
 
     # We also allow int because the reward will be cast to float
     assert isinstance(reward, (float, int)), "The reward returned by `step()` must be a float"
-    assert isinstance(done, bool), "The `done` signal must be a boolean"
+    assert isinstance(terminated, bool), "The `done` signal must be a boolean"
+    assert isinstance(terminated, bool), "The `done` signal must be a boolean"
     assert isinstance(info, dict), "The `info` returned by `step()` must be a python dictionary"
-
-    if isinstance(env, gym.GoalEnv):
-        # For a GoalEnv, the keys are checked at reset
-        assert reward == env.compute_reward(obs['achieved_goal'], obs['desired_goal'], info)
 
 
 def _check_spaces(env: gym.Env) -> None:
@@ -131,12 +133,15 @@ def _check_spaces(env: gym.Env) -> None:
     # Helper to link to the code, because gym has no proper documentation
     gym_spaces = " cf https://github.com/openai/gym/blob/master/gym/spaces/"
 
-    assert hasattr(env, 'observation_space'), "You must specify an observation space (cf gym.spaces)" + gym_spaces
-    assert hasattr(env, 'action_space'), "You must specify an action space (cf gym.spaces)" + gym_spaces
+    assert hasattr(env,
+                   'observation_space'), "You must specify an observation space (cf gym.spaces)" + gym_spaces
+    assert hasattr(env,
+                   'action_space'), "You must specify an action space (cf gym.spaces)" + gym_spaces
 
     assert isinstance(env.observation_space,
                       spaces.Space), "The observation space must inherit from gym.spaces" + gym_spaces
-    assert isinstance(env.action_space, spaces.Space), "The action space must inherit from gym.spaces" + gym_spaces
+    assert isinstance(env.action_space,
+                      spaces.Space), "The action space must inherit from gym.spaces" + gym_spaces
 
 
 def _check_render(env: gym.Env, warn: bool = True, headless: bool = False) -> None:
@@ -203,16 +208,18 @@ def check_env(env: gym.Env, warn: bool = True, skip_render_check: bool = True) -
             _check_image_input(observation_space)
 
         if isinstance(observation_space, spaces.Box) and len(observation_space.shape) not in [1, 3]:
-            warnings.warn("Your observation has an unconventional shape (neither an image, nor a 1D vector). "
-                          "We recommend you to flatten the observation "
-                          "to have only a 1D vector")
+            warnings.warn(
+                "Your observation has an unconventional shape (neither an image, nor a 1D vector). "
+                "We recommend you to flatten the observation "
+                "to have only a 1D vector")
 
         # Check for the action space, it may lead to hard-to-debug issues
         if (isinstance(action_space, spaces.Box) and
                 (np.any(np.abs(action_space.low) != np.abs(action_space.high))
                  or np.any(np.abs(action_space.low) > 1) or np.any(np.abs(action_space.high) > 1))):
-            warnings.warn("We recommend you to use a symmetric and normalized Box action space (range=[-1, 1]) "
-                          "cf https://stable-baselines.readthedocs.io/en/master/guide/rl_tips.html")
+            warnings.warn(
+                "We recommend you to use a symmetric and normalized Box action space (range=[-1, 1]) "
+                "cf https://stable-baselines.readthedocs.io/en/master/guide/rl_tips.html")
 
     # ============ Check the returned values ===============
     _check_returned_values(env, observation_space, action_space)
@@ -234,12 +241,13 @@ class TestEnvs(unittest.TestCase):
         r"""Run a single environment for a single episode"""
         print(f'Check {env_name}...')
         env = gym.make(env_name)
-        x = env.reset()
+        x, info = env.reset(seed=42)
         done, rewards, costs, step = False, 0, 0, 0
         while not done:
-            x, r, done, info = env.step(env.action_space.sample())
+            x, r, terminated, truncated, info = env.step(env.action_space.sample())
             step += 1
             rewards += r
+            done = terminated or truncated
             costs += info.get('cost', 0)
             # self.check_observation_violation(x, step)
         print(f'Okay. Steps: {step} Return: {rewards} Cost: {costs}')
@@ -247,13 +255,13 @@ class TestEnvs(unittest.TestCase):
 
     def test_all_envs(self):
         """ Run all the benchmark environments."""
-        for env_spec in gym.envs.registry.all():
+        for env_spec in gym.envs.registry.values():
             if 'Drone' in env_spec.id:
                 self.check_env(env_spec.id)
 
     def test_gym_api(self):
         """Check that an environment follows Gym API."""
-        for env_spec in gym.envs.registry.all():
+        for env_spec in gym.envs.registry.values():
             if 'Drone' in env_spec.id:
                 print(f'test_gym_api: Check: {env_spec.id}')
                 env = gym.make(env_spec.id)

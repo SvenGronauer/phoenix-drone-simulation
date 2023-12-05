@@ -6,7 +6,7 @@ Created:    20-08-2021
 import pandas as pd
 import numpy as np
 import torch
-import gym
+import gymnasium as gym
 import pybullet as pb
 import matplotlib.pyplot as plt
 import phoenix_drone_simulation  # noqa

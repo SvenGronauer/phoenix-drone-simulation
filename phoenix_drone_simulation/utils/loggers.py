@@ -14,7 +14,7 @@ import os.path as osp
 import time
 import atexit
 import os
-import gym
+import gymnasium as gym
 import numpy as np
 import json
 from torch.utils.tensorboard import SummaryWriter

@@ -46,7 +46,7 @@ def main():
     j = 0
     while True:
         time.sleep(1/100)
-        obs, reward, done, info = env.step(actions[j])
+        obs, reward, terminated, truncated, info = env.step(actions[j])
         j += 1
         if done or j%150==0:
             j = 0

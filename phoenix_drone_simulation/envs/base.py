@@ -1,9 +1,11 @@
 import os
+from typing import Any, Optional
 
 import numpy as np
 import pybullet as pb
 import pybullet_data
-import gym
+import gymnasium as gym
+from gymnasium.core import ObsType
 from pybullet_utils import bullet_client
 import abc
 
@@ -378,7 +380,12 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         else:
             raise NotImplementedError
 
-    def reset(self) -> np.ndarray:
+    def reset(
+            self,
+            *,
+            seed: Optional[int] = None,
+            options: Optional[dict[str, Any]] = None,
+    ) -> tuple[ObsType, dict[str, Any]]:
         """Reset environment to initial state.
 
         This function is called after agent encountered terminal state.
@@ -422,7 +429,7 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         self.last_action = action
         obs = self.compute_history()
 
-        return obs
+        return obs, {}
 
     def step(
             self,
@@ -463,9 +470,10 @@ class DroneBaseEnv(gym.Env, abc.ABC):
 
         r = self.compute_reward(action)
         info = self.compute_info()
-        done = self.compute_done()
+        terminated = self.compute_done()
+        truncated = False
         self.last_action = action
-        return next_obs, r, done, info
+        return next_obs, r, terminated, truncated, info
 
     @abc.abstractmethod
     def task_specific_reset(self):

@@ -3,7 +3,7 @@ r"""Generate batch-wise trajectory data from a drone environment.
 Author:     Sven Gronauer
 """
 import torch
-import gym
+import gymnasium as gym
 import numpy as np
 import time
 
@@ -73,7 +73,7 @@ class TrajectoryGenerator:
             x_stand = self.obs_rms(x)
             with torch.no_grad():
                 action = self.policy_net(x_stand).numpy()
-            x, r, done, info = self.env.step(action)
+            x, r, terminated, truncated, info = self.env.step(action)
             # print(f'Action={action}')
             costs += info.get('cost', 0.)
             ret += r
@@ -109,7 +109,7 @@ class TrajectoryGenerator:
             X.append(x.numpy())
             with torch.no_grad():
                 action = self.policy_net(x).numpy()
-            y, r, done, info = self.env.step(action)
+            y, r, terminated, truncated, info = self.env.step(action)
             Y.append(y)
             obs = y  # set old state (x_t) as new state (x_{t+1})
             t += 1

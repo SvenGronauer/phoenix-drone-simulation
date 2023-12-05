@@ -7,7 +7,7 @@ Important Note:
 import pandas as pd
 import numpy as np
 import torch
-import gym
+import gymnasium as gym
 import pybullet as pb
 import matplotlib.pyplot as plt
 import phoenix_drone_simulation  # noqa
@@ -55,7 +55,7 @@ def create_sim_data(N, env, env_id, actions):
     while i < N-1:
         # action = np.zeros(4)
         action = actions[i]
-        obs, r, done, info = env.step(action)
+        obs, r, terminated, truncated, info = env.step(action)
         i += 1
         data_sim[i] = obs  # (x, y, z, a, b, c, d, ... )
         if env_id == 'DroneCircleBulletEnv-v0' or env_id == 'DroneTakeOffBulletEnv-v0':

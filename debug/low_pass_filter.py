@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import torch
-import gym
+import gymnasium as gym
 import matplotlib.pyplot as plt
 import phoenix_drone_simulation  # noqa
 import time

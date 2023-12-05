@@ -5,7 +5,7 @@ Created:    14.04.2022
 """
 import numpy as np
 import os
-import gym
+import gymnasium as gym
 import torch
 import atexit
 import phoenix_drone_simulation.utils.mpi_tools as mpi_tools
@@ -98,7 +98,7 @@ class EnvironmentEvaluator(object):
         while not done:
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, value, *_ = self.ac(obs)
-            x, r, done, info = self.env.step(action)
+            x, r, terminated, truncated, info = self.env.step(action)
             ret += r
             costs += info.get('cost', 0.)
             episode_length += 1

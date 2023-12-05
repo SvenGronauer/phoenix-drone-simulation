@@ -4,7 +4,7 @@ Author:     Sven Gronauer
 Created:    12.05.2021
 """
 import os
-import gym
+import gymnasium as gym
 import phoenix_drone_simulation  # necessary to load our custom drone environments
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy

@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="phoenix_drone_simulation",
-    version="1.0",
+    version="1.1",
     author="Sven Gronauer",
     author_email="sven.gronauer@tum.de",
     description="Environments for learning to control the CrazyFlie quadrotor",
@@ -20,15 +20,17 @@ setuptools.setup(
     ],
     tests_require=['nose'],
     packages=setuptools.find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     include_package_data=True,
     install_requires=[
         'numpy',
-        'gym<=0.20.0',
+        'gymnasium>=0.29.1',
+        'joblib',
         'pybullet',
         'torch',
         'scipy>= 1.4',
         'mpi4py',
         'psutil',
+        'tensorboard',
     ],
 )

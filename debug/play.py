@@ -184,7 +184,7 @@ def play_after_training(actor_critic, env, noise=False):
         obs = torch.as_tensor(x, dtype=torch.float32)
         action, *_ = actor_critic(obs)
         actions.append(action)
-        x, r, done, info = env.step(action)
+        x, r, terminated, truncated, info = env.step(action)
         drone_rpms.append(env.unwrapped.drone.x)
         xs.append(convert_quat_obs_to_rpy(x))
     return np.array(xs), np.array(drone_rpms)

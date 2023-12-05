@@ -96,7 +96,7 @@ class Model(object):
             self.env.render() if render else None
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, value, info = actor_critic(obs)
-            x, r, done, info = env.step(action)
+            x, r, terminated, truncated, info = env.step(action)
             costs += info.get('cost', 0)
             ret += r
             episode_length += 1

@@ -8,7 +8,7 @@ based on:   Spinning Up's Repository
             https://github.com/SvenGronauer/successful-ingredients-paper
 """
 import numpy as np
-import gym
+import gymnasium as gym
 import time
 import torch
 import os
@@ -124,7 +124,7 @@ class IWPGAlgorithm(core.OnPolicyGradientAlgorithm):
         seed += 10000 * mpi_tools.proc_id()
         torch.manual_seed(seed)
         np.random.seed(seed)
-        self.env.seed(seed=seed)
+        self.env.reset(seed=seed)
 
         # === Setup actor-critic module
         self.ac = core.ActorCritic(
@@ -349,13 +349,14 @@ class IWPGAlgorithm(core.OnPolicyGradientAlgorithm):
 
     def roll_out(self) -> None:
         """collect data and store to experience buffer."""
-        o, ep_ret, ep_len = self.env.reset(), 0., 0
+        ep_ret, ep_len = 0., 0
+        o, _ = self.env.reset()
 
         for t in range(self.local_steps_per_epoch):
             a, v, logp = self.ac.step(
                 torch.as_tensor(o, dtype=torch.float32))
 
-            next_o, r, d, info = self.env.step(a)
+            next_o, r, terminated, _, info = self.env.step(a)
             ep_ret += r
             ep_len += 1
 
@@ -367,12 +368,12 @@ class IWPGAlgorithm(core.OnPolicyGradientAlgorithm):
             self.logger.store(**{'Values/V': v})
             o = next_o
 
-            timeout = ep_len == self.max_ep_len
-            terminal = d or timeout
+            truncated = ep_len == self.max_ep_len
+            terminal = terminated or truncated
             epoch_ended = t == self.local_steps_per_epoch - 1
 
             if terminal or epoch_ended:
-                if timeout or epoch_ended:
+                if truncated or epoch_ended:
                     _, v, _ = self.ac(
                         torch.as_tensor(o, dtype=torch.float32))
                 else:
@@ -380,7 +381,8 @@ class IWPGAlgorithm(core.OnPolicyGradientAlgorithm):
                 self.buf.finish_path(v)
                 if terminal:  # only save EpRet / EpLen if trajectory finished
                     self.logger.store(EpRet=ep_ret, EpLen=ep_len)
-                o, ep_ret, ep_len = self.env.reset(), 0., 0
+                ep_ret, ep_len = 0., 0
+                o, _ = self.env.reset()
 
     def update_running_statistics(self, data) -> None:
         """ Update running statistics, e.g. observation standardization,

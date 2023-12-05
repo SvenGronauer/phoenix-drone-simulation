@@ -9,7 +9,7 @@ https://raw.githubusercontent.com/openai/spinningup/master/spinup/algos/pytorch/
 from copy import deepcopy
 import numpy as np
 from torch.optim import Adam
-import gym
+import gymnasium as gym
 import time
 import torch
 import torch.nn as nn
@@ -398,7 +398,7 @@ class DeepDeterministicPolciyGradientAlgorithm(core.OffPolicyGradientAlgorithm):
             else:
                 a = self.get_action(o, self.act_noise)
 
-            next_o, r, done, info = self.env.step(a)
+            next_o, r, terminated, truncated, info = self.env.step(a)
             ep_ret += r
             ep_len += 1
 
