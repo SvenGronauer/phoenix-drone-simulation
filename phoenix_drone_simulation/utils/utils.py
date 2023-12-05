@@ -5,7 +5,7 @@ r"""Utility functions for Project Phoenix-Simulation.
     Updated:    16.11.2021 Add algorithm helper functions
                 16.04.2022 Added get_actor_critic_and_env_from_json_model
 """
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 import getpass
@@ -116,7 +116,8 @@ def build_mlp_network(data, force_dense_matrices: False) -> torch.nn.Module:
 def get_actor_critic_and_env_from_json_model(
         json_fnp: str,
         env_id: str,
-        algorithm: str = 'ppo' # look up default actor-critic values
+        algorithm: str = 'ppo',  # look up default actor-critic values
+        render_mode: Optional[str] = None,
 ) -> Tuple[torch.nn.Module, gym.Env]:
     r"""Loads a policy JSON file and creates an actor-critic Torch model.
 
@@ -124,7 +125,7 @@ def get_actor_critic_and_env_from_json_model(
     parameter values.
     """
     actor_network = load_network_json(json_fnp)
-    env = gym.make(env_id)
+    env = gym.make(env_id, render_mode=render_mode)
     actor_config = get_defaults_kwargs(alg=algorithm, env_id=env_id)
 
     ac = core.ActorCritic(
@@ -449,7 +450,8 @@ def convert_actor_critic_to_json(
 
 
 def load_actor_critic_and_env_from_disk(
-        file_name_path: str
+        file_name_path: str,
+        render_mode: Optional[str] = None
 ) -> tuple:
     """Loads ac module from disk. (@Sven).
 
@@ -467,7 +469,7 @@ def load_actor_critic_and_env_from_disk(
     print('Loaded config file:')
     print(conf)
     env_id = conf.get('env_id')
-    env = gym.make(env_id)
+    env = gym.make(env_id, render_mode=render_mode)
     alg = conf.get('alg', 'ppo')
 
     if alg == 'sac':

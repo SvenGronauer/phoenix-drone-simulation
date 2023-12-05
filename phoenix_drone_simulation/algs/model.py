@@ -87,13 +87,11 @@ class Model(object):
 
     def _eval_once(self, actor_critic, env, render) -> tuple:
         done = False
-        self.env.render() if render else None
         x = self.env.reset()
         ret = 0.
         costs = 0.
         episode_length = 0
         while not done:
-            self.env.render() if render else None
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, value, info = actor_critic(obs)
             x, r, terminated, truncated, info = env.step(action)

@@ -15,9 +15,7 @@ from phoenix_drone_simulation.envs.control import AttitudeRate
 
 def main():
     # control mode of DroneTakeOffBulletEnv is PWM by default:
-    env = DroneTakeOffBulletEnv()
-    # Important: call render before updating the controller and domain rand
-    env.render()
+    env = DroneTakeOffBulletEnv(render_mode="human")
 
     # overwrite PWM control with Attitude-Rate PID controller
     env.drone.control = AttitudeRate(
@@ -45,10 +43,11 @@ def main():
     env.reset()
     j = 0
     while True:
-        time.sleep(1/100)
+        time.sleep(1 / 100)
         obs, reward, terminated, truncated, info = env.step(actions[j])
         j += 1
-        if done or j%150==0:
+        done = terminated or truncated
+        if done or j % 150 == 0:
             j = 0
             env.reset()
     # env.close()
@@ -56,4 +55,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -96,12 +96,11 @@ import gymnasium as gym
 import time
 import phoenix_drone_simulation
 
-env = gym.make('DroneHoverBulletEnv-v0')
+env = gym.make('DroneHoverBulletEnv-v0', render_mode="human")
 
 while True:
     done = False
-    env.render()  # make GUI of PyBullet appear
-    x = env.reset()
+    x, _ = env.reset()
     while not done:
         random_action = env.action_space.sample()
         x, reward, terminated, truncated, info = env.step(random_action)

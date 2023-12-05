@@ -11,7 +11,7 @@ def main():
     env_id = 'DroneCircleBulletEnv-v0'
     policy_name = "model_50_50_relu_PWM_circle_task.json"
     json_fnp = utils.get_policy_filename_path(policy_name)
-    ac, env = utils.get_actor_critic_and_env_from_json_model(json_fnp, env_id)
+    ac, env = utils.get_actor_critic_and_env_from_json_model(json_fnp, env_id, render_mode="human")
 
     play_after_training(
         actor_critic=ac,

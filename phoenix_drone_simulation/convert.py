@@ -19,12 +19,6 @@ def convert(ckpt,output,save_file_path=None):
     assert os.path.exists(ckpt)
     if output == 'h5':
         raise NotImplementedError
-        # ac, env = utils.load_actor_critic_and_env_from_disk(ckpt)
-        # export.convert_actor_critic_to_h5(
-        #     actor_critic=ac,
-        #     file_path=ckpt,
-        #     save_file_path=save_file_path
-        # )
     elif output == 'json':
         ac, env = utils.load_actor_critic_and_env_from_disk(ckpt)
         export.convert_actor_critic_to_json(

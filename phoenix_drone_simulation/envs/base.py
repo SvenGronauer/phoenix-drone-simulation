@@ -1,11 +1,11 @@
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 import pybullet as pb
 import pybullet_data
 import gymnasium as gym
-from gymnasium.core import ObsType
+from gymnasium.core import ObsType, RenderFrame
 from pybullet_utils import bullet_client
 import abc
 
@@ -36,14 +36,15 @@ class DroneBaseEnv(gym.Env, abc.ABC):
             debug=False,
             domain_randomization: float = -1,  # deactivated when negative value
             enable_reset_distribution=True,
-            graphics=False,
+            render_mode: Optional[str] = None,
             latency: float = 0.015,  # [s]
             motor_time_constant: float = 0.080,  # [s]
             motor_thrust_noise: float = 0.05,  # noise in % added to thrusts
             observation_frequency: int = 100,
             observation_history_size: int = 2,
             observation_noise=0.0,  # default: no noise added to obs
-            sim_freq: int = 200
+            sim_freq: int = 200,
+            **kwargs
     ):
         """
 
@@ -77,7 +78,8 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         self.drone_model = drone_model
         self.enable_reset_distribution = enable_reset_distribution
         self.input_parameters = locals()  # save setting for later reset
-        self.use_graphics = graphics
+        self.render_mode = render_mode
+        self.use_graphics = True if render_mode == "human" else False
 
         # init drone state
         assert np.ndim(init_xyz) == 1 and np.ndim(init_rpy) == 1
@@ -341,10 +343,7 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         """Implemented by child classes."""
         raise NotImplementedError
 
-    def render(
-            self,
-            mode='human'
-    ) -> np.ndarray:
+    def render(self) -> Union[RenderFrame, list[RenderFrame], None]:
         """Show PyBullet GUI visualization.
 
         Render function triggers the PyBullet GUI visualization.
@@ -361,7 +360,7 @@ class DroneBaseEnv(gym.Env, abc.ABC):
         array
             holding RBG image of environment if mode == 'rgb_array'
         """
-        if mode == 'human':
+        if self.render_mode == 'human':
             # close direct connection to physics server and
             # create new instance of physics with GUI visuals
             if not self.use_graphics:
@@ -375,7 +374,7 @@ class DroneBaseEnv(gym.Env, abc.ABC):
                 # Save the current PyBullet instance as save state
                 # => This avoids errors when enabling rendering after training
                 self.stored_state_id = self.bc.saveState()
-        if mode != "rgb_array":
+        elif self.render_mode == "rgb_array":
             return np.array([])
         else:
             raise NotImplementedError

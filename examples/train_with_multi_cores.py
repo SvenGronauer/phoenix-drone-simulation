@@ -3,14 +3,11 @@
 Author:     Sven Gronauer (sven.gronauer@tum.de)
 Created:    16.11.2021
 """
-import argparse
 import numpy as np
 import psutil
 import sys
-import gymnasium as gym
 import getpass
 import time
-import torch
 
 # local imports:
 import phoenix_drone_simulation  # necessary to load our custom drone environments

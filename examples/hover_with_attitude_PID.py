@@ -14,9 +14,7 @@ from phoenix_drone_simulation.envs.control import Attitude
 
 
 def main():
-    env = DroneHoverBulletEnv()
-    # Important: call render before updating the controller and domain rand
-    env.render()
+    env = DroneHoverBulletEnv(render_mode="human")
 
     # set PID
     env.drone.control = Attitude(
@@ -27,14 +25,14 @@ def main():
     )
 
     env.enable_reset_distribution = False
-    env.domain_randomization = 0.20  # make DR large to see robustness of PID
+    env.domain_randomization = 0.01  # make DR large to see robustness of PID
     T = 10000
 
     # == Action Design:
     # a[0]: thrust
     # a[1:3]: roll, pitch, yaw
     actions = np.zeros((T, 4))
-    actions[:, 0] = -0.8 # env.drone.HOVER_ACTION - 0.42
+    actions[:, 0] = -0.1 # env.drone.HOVER_ACTION - 0.42
     actions[:, 1] = 0.0 #5 * np.sin(np.arange(T)/T*20*np.pi)  # roll
     actions[:, 2] = 0.0 #5 * np.cos(np.arange(T)/T*20*np.pi)  # pitch
     actions[:, 3] = 0  # yaw

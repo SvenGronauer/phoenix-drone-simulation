@@ -20,13 +20,11 @@ def play_after_training(actor_critic, env, noise=False):
     # pb.setRealTimeSimulation(1)
     while True:
         done = False
-        env.render()
-        x = env.reset()
+        x, info = env.reset()
         ret = 0.
         costs = 0.
         episode_length = 0
         while not done:
-            env.render()
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, *_ = actor_critic(obs)
             x, r, terminated, truncated, info = env.step(action)
@@ -40,7 +38,8 @@ def play_after_training(actor_critic, env, noise=False):
 
 
 def random_play(env_id, use_graphics):
-    env = gym.make(env_id)
+    render_mode = "human " if use_graphics else None
+    env = gym.make(env_id, render_mode=render_mode)
     i = 0
     rets = []
     TARGET_FPS = 60
@@ -48,7 +47,6 @@ def random_play(env_id, use_graphics):
     while True:
         i += 1
         done = False
-        env.render(mode='human') if use_graphics else None
         env.reset()
         ts = time.time()
         ret = 0.
@@ -56,9 +54,6 @@ def random_play(env_id, use_graphics):
         ep_length = 0
         while not done:
             ts1 = time.time()
-            if use_graphics:
-                env.render()
-                # time.sleep(0.00025)
             action = env.action_space.sample()
             _, r, terminated, truncated, info = env.step(action)
             ret += r
@@ -100,7 +95,7 @@ if __name__ == '__main__':
         random_play(env_id, use_graphics)
     else:
         assert args.ckpt, 'Define a checkpoint for non-random play!'
-        ac, env = utils.load_actor_critic_and_env_from_disk(args.ckpt)
+        ac, env = utils.load_actor_critic_and_env_from_disk(args.ckpt, "human")
 
         play_after_training(
             actor_critic=ac,

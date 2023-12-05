@@ -44,10 +44,7 @@ def main():
     model.eval()
 
     # 4) visualize trained PPO model
-    env = gym.make(env_id)
-    env.render()
-    # Important note:   PyBullet necessitates to call env.render() before
-    #  env.reset() to display the GUI!
+    env = gym.make(env_id, render_mode="human")
     while True:
         obs = env.reset()
         done = False

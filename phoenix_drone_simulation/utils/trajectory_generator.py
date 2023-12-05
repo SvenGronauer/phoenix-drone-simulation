@@ -68,7 +68,6 @@ class TrajectoryGenerator:
         done = False
         while not done:
             ts = time.time()
-            self.env.render(mode='human') if render else None
             x = torch.as_tensor(x, dtype=torch.float32)
             x_stand = self.obs_rms(x)
             with torch.no_grad():
@@ -151,5 +150,4 @@ class TrajectoryGenerator:
         # i = 0
         # pb.setRealTimeSimulation(1)
         while True:
-            self.env.render()
             self.evaluate_once(render=True)
