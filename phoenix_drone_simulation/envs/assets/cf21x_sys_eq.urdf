@@ -26,7 +26,7 @@ In contrast to cf2x.urdf, the motor IDs have a different order.
     <visual>
       <origin rpy="0 0 55" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="./cf2.dae" scale=" 1 1 1"/>
+        <mesh filename="./meshes/cf2.dae" scale=" 1 1 1"/>
       </geometry> 
       <material name="grey">
         <color rgba=".5 .5 .5 1"/>
