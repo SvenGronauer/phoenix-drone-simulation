@@ -87,7 +87,7 @@ class Model(object):
 
     def _eval_once(self, actor_critic, env, render) -> tuple:
         done = False
-        x = self.env.reset()
+        x, _ = self.env.reset()
         ret = 0.
         costs = 0.
         episode_length = 0
@@ -95,6 +95,7 @@ class Model(object):
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, value, info = actor_critic(obs)
             x, r, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
             costs += info.get('cost', 0)
             ret += r
             episode_length += 1

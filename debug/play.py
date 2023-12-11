@@ -178,7 +178,6 @@ def play_after_training(actor_critic, env, noise=False):
     x = env.reset()
     xs = [convert_quat_obs_to_rpy(x), ]
     drone_rpms = [env.unwrapped.drone.x, ]
-    # while not done:
     T = 500
     for t in range(T):
         obs = torch.as_tensor(x, dtype=torch.float32)

@@ -61,7 +61,7 @@ class TrajectoryGenerator:
         """
         TARGET_FPS = 100
         target_dt = 1.0 / TARGET_FPS
-        x = self.env.reset()
+        x, _ = self.env.reset()
         ret = 0.
         costs = 0.
         episode_length = 0
@@ -74,6 +74,7 @@ class TrajectoryGenerator:
                 action = self.policy_net(x_stand).numpy()
             x, r, terminated, truncated, info = self.env.step(action)
             # print(f'Action={action}')
+            done = terminated or truncated
             costs += info.get('cost', 0.)
             ret += r
             episode_length += 1
@@ -102,7 +103,7 @@ class TrajectoryGenerator:
         t = 0
         X = []
         Y = []
-        obs = self.env.reset()
+        obs, _ = self.env.reset()
         while t < N:
             x = self.obs_rms(torch.as_tensor(obs, dtype=torch.float32))
             X.append(x.numpy())
@@ -113,7 +114,7 @@ class TrajectoryGenerator:
             obs = y  # set old state (x_t) as new state (x_{t+1})
             t += 1
             if done:
-                obs = self.env.reset()
+                obs, _ = self.env.reset()
         return np.array(X), np.array(Y)
 
     def load_file_from_disk(

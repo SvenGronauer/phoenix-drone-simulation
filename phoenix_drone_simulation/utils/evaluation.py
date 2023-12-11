@@ -90,7 +90,7 @@ class EnvironmentEvaluator(object):
     def eval_once(self):
         assert not self.ac.training, 'Call actor_critic.eval() beforehand.'
         done = False
-        x = self.env.reset()
+        x, _ = self.env.reset()
         ret = 0.
         costs = 0.
         episode_length = 0
@@ -99,6 +99,7 @@ class EnvironmentEvaluator(object):
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, value, *_ = self.ac(obs)
             x, r, terminated, truncated, info = self.env.step(action)
+            done = terminated or truncated
             ret += r
             costs += info.get('cost', 0.)
             episode_length += 1

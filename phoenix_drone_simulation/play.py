@@ -28,6 +28,7 @@ def play_after_training(actor_critic, env, noise=False):
             obs = torch.as_tensor(x, dtype=torch.float32)
             action, *_ = actor_critic(obs)
             x, r, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
             costs += info.get('cost', 0.)
             ret += r
             episode_length += 1
@@ -56,6 +57,7 @@ def random_play(env_id, use_graphics):
             ts1 = time.time()
             action = env.action_space.sample()
             _, r, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
             ret += r
             ep_length += 1
             costs += info.get('cost', 0.)
